@@ -3,27 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>LuxWear Premium | QR Management v2.0</title>
+    <title>LuxWear Premium | Management System v3.0</title>
     
     <script src="https://unpkg.com/html5-qrcode"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <style>
+        /* 1. ASOSIY RANG VA O'ZGARUVCHILAR */
         :root {
-            --primary: #FFD700; /* Oltin rang */
+            --primary: #FFD700;
+            --primary-dark: #ccac00;
             --bg: #000000;
             --card-bg: #121212;
+            --input-bg: #1a1a1a;
             --text-main: #FFFFFF;
             --text-gray: #888888;
             --accent: #1DB954;
             --danger: #FF4D4D;
             --glass: rgba(255, 255, 255, 0.05);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
+        /* 2. UMUMIY STYLES */
         * {
             margin: 0; padding: 0; box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             -webkit-tap-highlight-color: transparent;
         }
 
@@ -31,118 +36,239 @@
             background-color: var(--bg);
             color: var(--text-main);
             min-height: 100vh;
+            overflow-x: hidden;
+            line-height: 1.6;
         }
 
-        /* --- Header (Sizning dizayn) --- */
+        /* 3. HEADER & LOGO */
         header {
             padding: 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             border-bottom: 1px solid #222;
-            position: sticky; top: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(15px); z-index: 100;
+            position: sticky;
+            top: 0;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(15px);
+            z-index: 1000;
         }
 
-        .logo-area { display: flex; align-items: center; gap: 12px; }
+        .logo-area { display: flex; align-items: center; gap: 15px; }
         .logo-box {
-            background: var(--primary); color: #000;
-            padding: 8px 12px; font-weight: 800; border-radius: 8px; font-size: 20px;
-            box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+            background: linear-gradient(135deg, var(--primary), #b8860b);
+            color: #000;
+            padding: 10px 14px;
+            font-weight: 900;
+            border-radius: 12px;
+            font-size: 22px;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
         }
-        .logo-text h1 { font-size: 18px; letter-spacing: 1px; }
-        .logo-text p { font-size: 10px; color: var(--text-gray); text-transform: uppercase; }
+        .logo-text h1 { font-size: 20px; letter-spacing: 0.5px; font-weight: 800; }
+        .logo-text p { font-size: 10px; color: var(--text-gray); text-transform: uppercase; letter-spacing: 2px; }
 
-        /* --- Navigation --- */
+        .header-actions i {
+            font-size: 24px;
+            color: var(--primary);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .header-actions i:active { transform: scale(0.9); }
+
+        /* 4. NAVIGATSIYA */
         nav {
-            position: fixed; bottom: 0; width: 100%;
-            background: rgba(0,0,0,0.9); border-top: 1px solid #222;
-            display: flex; justify-content: space-around; padding: 15px 0; z-index: 100;
-            backdrop-filter: blur(10px);
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background: rgba(10, 10, 10, 0.95);
+            border-top: 1px solid #222;
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0 25px 0; /* Pastki qism iPhone uchun qulayroq */
+            z-index: 1000;
+            backdrop-filter: blur(20px);
         }
         .nav-btn {
-            background: none; border: none; color: var(--text-gray);
-            font-size: 12px; cursor: pointer; transition: 0.3s;
-            display: flex; flex-direction: column; align-items: center; gap: 5px;
+            background: none;
+            border: none;
+            color: var(--text-gray);
+            font-size: 11px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: var(--transition);
+            width: 25%;
         }
-        .nav-btn i { font-size: 20px; }
-        .nav-btn.active { color: var(--primary); text-shadow: 0 0 10px rgba(255, 215, 0, 0.5); }
+        .nav-btn i { font-size: 22px; }
+        .nav-btn.active { color: var(--primary); }
+        .nav-btn.active i { transform: translateY(-3px); }
 
-        /* --- Content Sections --- */
-        .section { display: none; padding: 20px; padding-bottom: 120px; animation: fadeIn 0.4s ease; }
+        /* 5. SEKSIYALAR */
+        .section {
+            display: none;
+            padding: 20px;
+            padding-bottom: 120px;
+            animation: slideUp 0.4s ease-out;
+        }
         .section.active { display: block; }
-
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* --- Scanner Styling --- */
-        .scanner-card {
-            background: var(--card-bg); border-radius: 20px; padding: 20px; text-align: center;
-            border: 1px solid #333; margin-top: 20px;
-        }
-        #reader { width: 100%; border-radius: 15px; overflow: hidden; margin: 15px 0; border: 1px dashed var(--primary); }
-        .camera-btn {
-            background: var(--primary); color: #000; width: 100%; padding: 15px;
-            border-radius: 12px; font-weight: bold; border: none; margin-top: 15px; cursor: pointer;
-            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.2);
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
-        /* --- Admin & Grid --- */
-        .admin-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .add-btn { background: var(--primary); color: #000; padding: 10px 18px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; }
-        
-        .product-grid { display: grid; grid-template-columns: 1fr; gap: 15px; }
+        /* 6. SKANERLASH BO'LIMI */
+        .scanner-container {
+            background: var(--card-bg);
+            border-radius: 25px;
+            padding: 25px;
+            border: 1px solid #333;
+            text-align: center;
+        }
+        #reader {
+            width: 100%;
+            border-radius: 20px;
+            overflow: hidden;
+            border: 2px dashed #444;
+            background: #000;
+            margin-bottom: 20px;
+        }
+        .scanner-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        .btn-scan {
+            padding: 15px;
+            border-radius: 15px;
+            border: none;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .btn-cam { background: var(--primary); color: #000; }
+        .btn-gal { background: #222; color: #fff; border: 1px solid #444; }
+
+        /* 7. ADMIN / KATALOG */
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
         .product-card {
-            background: var(--card-bg); border-radius: 20px; padding: 15px; border: 1px solid #222;
-            display: flex; align-items: center; gap: 15px; position: relative;
-            transition: 0.3s;
+            background: var(--card-bg);
+            border-radius: 20px;
+            overflow: hidden;
+            border: 1px solid #222;
+            transition: var(--transition);
+            position: relative;
         }
-        .qr-small { background: #fff; padding: 5px; border-radius: 10px; min-width: 85px; height: 85px; }
-        .card-info { flex: 1; }
-        .card-info h4 { font-size: 16px; margin-bottom: 4px; }
-        .card-info p { color: var(--primary); font-weight: bold; font-size: 15px; }
-        .tags-row { display: flex; gap: 5px; margin-top: 8px; flex-wrap: wrap; }
-        .tag { background: #252525; color: #ccc; padding: 3px 8px; border-radius: 5px; font-size: 10px; border: 1px solid #333; }
-        .delete-icon { position: absolute; top: 15px; right: 15px; color: var(--danger); opacity: 0.6; }
-
-        /* --- Custom Inputs & Chips --- */
-        .form-group { margin-bottom: 20px; }
-        .form-group label { display: block; font-size: 13px; color: var(--text-gray); margin-bottom: 10px; }
+        .product-card:active { transform: scale(0.97); }
         
-        /* Slider (Range) Customization */
-        input[type="range"] {
-            width: 100%; -webkit-appearance: none; background: #333; height: 6px; border-radius: 5px; outline: none;
+        .product-img {
+            width: 100%;
+            aspect-ratio: 1/1.1;
+            background: #1a1a1a;
+            position: relative;
         }
-        input[type="range"]::-webkit-slider-thumb {
-            -webkit-appearance: none; height: 20px; width: 20px; background: var(--primary); border-radius: 50%; cursor: pointer;
-            box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
-        }
-
-        /* Chips */
-        .chip-container { display: flex; flex-wrap: wrap; gap: 10px; }
-        .chip {
-            padding: 10px 15px; background: #1a1a1a; border: 1px solid #333; border-radius: 10px;
-            font-size: 13px; cursor: pointer; transition: 0.2s;
-        }
-        .chip.active { background: var(--primary); color: #000; border-color: var(--primary); font-weight: bold; }
-
-        /* --- Stats Styling --- */
-        .stats-summary { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 10px; }
-        .stat-item { background: var(--card-bg); padding: 20px; border-radius: 20px; border: 1px solid #222; }
-        .stat-item span { font-size: 12px; color: var(--text-gray); }
-        .stat-item h2 { margin-top: 5px; color: var(--primary); }
-
-        /* --- Modal --- */
+        .product-img img { width: 100%; height: 100%; object-fit: cover; }
+        
+        .product-info { padding: 12px; }
+        .product-info h4 { font-size: 14px; font-weight: 600; margin-bottom: 5px; color: #eee; }
+        .product-info .price { color: var(--primary); font-weight: 800; font-size: 15px; }
+        
+        /* 8. FORMA ELEMENTLARI */
         .modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.95); z-index: 1000; display: none;
-            justify-content: center; align-items: center;
+            background: rgba(0,0,0,0.9); z-index: 2000; display: none;
+            justify-content: center; align-items: flex-end;
         }
         .modal-content {
-            background: var(--card-bg); width: 90%; max-width: 450px;
-            padding: 25px; border-radius: 25px; border: 1px solid #333;
-            max-height: 90vh; overflow-y: auto;
+            background: var(--card-bg);
+            width: 100%;
+            max-width: 500px;
+            padding: 30px 20px;
+            border-radius: 30px 30px 0 0;
+            border-top: 2px solid var(--primary);
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: modalSlide 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-        input[type="text"] { width: 100%; background: #1a1a1a; border: 1px solid #333; color: #fff; padding: 12px; border-radius: 10px; outline: none; }
-        .btn-save { background: var(--primary); color: #000; width: 100%; padding: 15px; border-radius: 10px; border: none; font-weight: bold; margin-top: 20px; font-size: 16px; }
+        @keyframes modalSlide { from { transform: translateY(100%); } to { transform: translateY(0); } }
+
+        .form-group { margin-bottom: 22px; }
+        .form-group label { display: block; font-size: 13px; color: var(--text-gray); margin-bottom: 10px; font-weight: 500; }
+        
+        input[type="text"], textarea, input[type="number"] {
+            width: 100%; background: var(--input-bg); border: 1px solid #333;
+            color: #fff; padding: 14px; border-radius: 12px; outline: none; font-size: 15px;
+        }
+        input:focus { border-color: var(--primary); }
+
+        .range-box {
+            background: #1a1a1a; padding: 15px; border-radius: 12px; border: 1px solid #333;
+        }
+        .range-header { display: flex; justify-content: space-between; margin-bottom: 10px; }
+        .range-header b { color: var(--primary); }
+        input[type="range"] {
+            width: 100%; height: 6px; background: #444; border-radius: 5px; outline: none; accent-color: var(--primary);
+        }
+
+        /* Chips (Multiple Select) */
+        .chip-container { display: flex; flex-wrap: wrap; gap: 10px; }
+        .chip {
+            padding: 10px 18px; background: #222; border: 1px solid #333;
+            border-radius: 12px; font-size: 13px; cursor: pointer; transition: 0.2s;
+        }
+        .chip.selected {
+            background: var(--primary); color: #000; font-weight: bold; border-color: var(--primary);
+            box-shadow: 0 4px 10px rgba(255, 215, 0, 0.2);
+        }
+
+        .img-upload-btn {
+            width: 100%; height: 120px; border: 2px dashed #444; border-radius: 15px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            color: #888; cursor: pointer; transition: 0.3s; background: #0a0a0a;
+        }
+        .img-upload-btn i { font-size: 30px; margin-bottom: 8px; }
+        .img-upload-btn.previewed { border: 2px solid var(--primary); color: var(--primary); }
+
+        /* 9. DETAL KO'RISH (PREVIEW) */
+        .preview-img { width: 100%; border-radius: 20px; margin-bottom: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .qr-wrapper {
+            background: #fff; padding: 20px; border-radius: 20px; display: inline-block;
+            margin: 20px 0; box-shadow: 0 0 20px rgba(255,255,255,0.1);
+        }
+        .btn-confirm {
+            background: var(--accent); color: #fff; width: 100%; padding: 16px;
+            border-radius: 15px; font-weight: 800; border: none; font-size: 16px; margin-top: 15px;
+        }
+        .btn-delete { color: var(--danger); background: none; border: none; margin-top: 20px; font-weight: bold; width: 100%; }
+
+        /* 10. TAHLIL STATISTIKA */
+        .stats-grid { display: grid; grid-template-columns: 1fr; gap: 15px; }
+        .stat-card {
+            background: var(--card-bg); padding: 25px; border-radius: 25px; border: 1px solid #222;
+            position: relative; overflow: hidden;
+        }
+        .stat-card::after {
+            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+            background: radial-gradient(circle, rgba(255,215,0,0.03) 0%, transparent 70%);
+        }
+        .stat-card span { color: var(--text-gray); font-size: 13px; font-weight: 500; }
+        .stat-card h2 { font-size: 28px; margin-top: 8px; color: var(--primary); letter-spacing: -1px; }
+
     </style>
 </head>
 <body>
@@ -152,240 +278,359 @@
             <div class="logo-box">LX</div>
             <div class="logo-text">
                 <h1>LuxWear</h1>
-                <p>Premium Boutique</p>
+                <p>Management System</p>
             </div>
         </div>
-        <i class="fas fa-chart-bar" style="color: var(--primary); font-size: 20px;"></i>
+        <div class="header-actions">
+            <i class="fas fa-plus-circle" onclick="openAddModal()"></i>
+        </div>
     </header>
 
-    <section id="scanner" class="section active">
-        <div class="scanner-card">
-            <h2>Mahsulotni skanerlang</h2>
-            <p style="color: var(--text-gray); font-size: 13px; margin-top: 5px;">Kamerani QR kodga qarating</p>
+    <section id="scanner-sec" class="section active">
+        <div class="scanner-container">
+            <h2 style="margin-bottom: 10px;">Mahsulot Skaneri</h2>
+            <p style="color: var(--text-gray); font-size: 13px; margin-bottom: 20px;">QR kodni kamera yoki galereya orqali kiriting</p>
+            
             <div id="reader"></div>
-            <button class="camera-btn" onclick="toggleCamera()">
-                <i class="fas fa-camera"></i> Kamerani yoqish
-            </button>
+            
+            <div class="scanner-buttons">
+                <button class="btn-scan btn-cam" onclick="startCamera()">
+                    <i class="fas fa-camera"></i> Kamera
+                </button>
+                <button class="btn-scan btn-gal" onclick="document.getElementById('gallery-input').click()">
+                    <i class="fas fa-image"></i> Galereya
+                </button>
+            </div>
+            <input type="file" id="gallery-input" accept="image/*" style="display: none;" onchange="scanFromGallery(this)">
         </div>
     </section>
 
-    <section id="admin" class="section">
-        <div class="admin-controls">
-            <h2>Mahsulotlar</h2>
-            <button class="add-btn" onclick="openAddModal()">+ Yangi qo'shish</button>
+    <section id="admin-sec" class="section">
+        <div class="admin-header">
+            <h2>Katalog</h2>
+            <span id="items-count" style="color: var(--text-gray); font-size: 13px;">0 mahsulot</span>
         </div>
-        <div id="product-list" class="product-grid"></div>
+        <div id="product-list" class="product-grid">
+            </div>
     </section>
 
-    <section id="tahlil" class="section">
-        <h2 style="margin-bottom: 15px;">Daromad tahlili</h2>
-        <div class="stats-summary">
-            <div class="stat-item" style="grid-column: span 2;">
-                <span>Jami tushum</span>
-                <h2 id="total-sales">0 so'm</h2>
+    <section id="tahlil-sec" class="section">
+        <h2 style="margin-bottom: 20px;">Savdo Statistikasi</h2>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <span>Umumiy Savdo</span>
+                <h2 id="stat-total-sales">0 so'm</h2>
             </div>
-            <div class="stat-item">
-                <span>Sof foyda</span>
-                <h2 id="net-profit">0 so'm</h2>
-            </div>
-            <div class="stat-item">
-                <span>Sotilgan tovar</span>
-                <h2 id="items-sold">0 ta</h2>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <div class="stat-card">
+                    <span>Sof Foyda</span>
+                    <h2 id="stat-net-profit" style="color: var(--accent);">0 so'm</h2>
+                </div>
+                <div class="stat-card">
+                    <span>Sotilgan</span>
+                    <h2 id="stat-items-sold">0 ta</h2>
+                </div>
             </div>
         </div>
     </section>
 
     <nav>
-        <button class="nav-btn active" onclick="showTab('scanner', this)">
+        <button class="nav-btn active" onclick="switchTab('scanner-sec', this)">
             <i class="fas fa-qrcode"></i><span>Skaner</span>
         </button>
-        <button class="nav-btn" onclick="showTab('admin', this)">
-            <i class="fas fa-box"></i><span>Admin</span>
+        <button class="nav-btn" onclick="switchTab('admin-sec', this)">
+            <i class="fas fa-tshirt"></i><span>Katalog</span>
         </button>
-        <button class="nav-btn" onclick="showTab('tahlil', this)">
-            <i class="fas fa-chart-line"></i><span>Tahlil</span>
+        <button class="nav-btn" onclick="switchTab('tahlil-sec', this)">
+            <i class="fas fa-chart-pie"></i><span>Tahlil</span>
         </button>
     </nav>
 
     <div id="addModal" class="modal">
         <div class="modal-content">
-            <h3 style="color: var(--primary); margin-bottom: 20px;">Yangi mahsulot qo'shish</h3>
+            <h2 style="margin-bottom: 25px;">Yangi mahsulot</h2>
             
             <div class="form-group">
-                <label>Mahsulot nomi</label>
-                <input type="text" id="p-name" placeholder="Masalan: Oversize Hoodie">
+                <label>Mahsulot rasmi</label>
+                <div class="img-upload-btn" id="img-preview-btn" onclick="document.getElementById('p-img-file').click()">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <span>Rasm yuklash</span>
+                </div>
+                <input type="file" id="p-img-file" accept="image/*" style="display: none;" onchange="handleImgSelect(this)">
             </div>
 
             <div class="form-group">
-                <label>Sotish narxi: <b id="lbl-price" style="color:var(--primary)">500,000</b> so'm</label>
-                <input type="range" id="p-price" min="10000" max="5000000" step="10000" value="500000" oninput="updateVal('lbl-price', this.value)">
+                <label>Nomi</label>
+                <input type="text" id="p-name" placeholder="Masalan: Erkaklar Classic Kostyumi">
             </div>
 
             <div class="form-group">
-                <label>Tan narxi: <b id="lbl-cost" style="color:var(--primary)">300,000</b> so'm</label>
-                <input type="range" id="p-cost" min="10000" max="5000000" step="10000" value="300000" oninput="updateVal('lbl-cost', this.value)">
+                <label>Tavsif (Tafsilotlar)</label>
+                <textarea id="p-desc" rows="2" placeholder="Materiali, sifati va boshqalar..."></textarea>
             </div>
 
             <div class="form-group">
-                <label>O'lcham</label>
+                <div class="range-box">
+                    <div class="range-header">Sotish narxi: <b id="val-price">500,000</b> so'm</div>
+                    <input type="range" id="p-price" min="10000" max="5000000" step="10000" value="500000" oninput="updateRangeLabel('val-price', this.value)">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="range-box">
+                    <div class="range-header">Tan narxi (Olib kelingan): <b id="val-cost">350,000</b> so'm</div>
+                    <input type="range" id="p-cost" min="10000" max="5000000" step="10000" value="350000" oninput="updateRangeLabel('val-cost', this.value)">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>O'lchamlar (Bir nechtasini tanlang)</label>
                 <div class="chip-container" id="size-chips">
-                    <div class="chip" onclick="selectChip(this, 'size')">S</div>
-                    <div class="chip" onclick="selectChip(this, 'size')">M</div>
-                    <div class="chip" onclick="selectChip(this, 'size')">L</div>
-                    <div class="chip" onclick="selectChip(this, 'size')">XL</div>
-                    <div class="chip" onclick="selectChip(this, 'size')">XXL</div>
+                    <div class="chip" onclick="toggleChip(this)">S</div>
+                    <div class="chip" onclick="toggleChip(this)">M</div>
+                    <div class="chip" onclick="toggleChip(this)">L</div>
+                    <div class="chip" onclick="toggleChip(this)">XL</div>
+                    <div class="chip" onclick="toggleChip(this)">XXL</div>
+                    <div class="chip" onclick="toggleChip(this)">3XL</div>
                 </div>
             </div>
 
             <div class="form-group">
-                <label>Rang</label>
+                <label>Ranglar (Bir nechtasini tanlang)</label>
                 <div class="chip-container" id="color-chips">
-                    <div class="chip" onclick="selectChip(this, 'color')">Qora</div>
-                    <div class="chip" onclick="selectChip(this, 'color')">Oq</div>
-                    <div class="chip" onclick="selectChip(this, 'color')">Kulrang</div>
-                    <div class="chip" onclick="selectChip(this, 'color')">Sariq</div>
-                    <div class="chip" onclick="selectChip(this, 'color')">Ko'k</div>
+                    <div class="chip" onclick="toggleChip(this)">Qora</div>
+                    <div class="chip" onclick="toggleChip(this)">Oq</div>
+                    <div class="chip" onclick="toggleChip(this)">Jigarrang</div>
+                    <div class="chip" onclick="toggleChip(this)">Kulrang</div>
+                    <div class="chip" onclick="toggleChip(this)">Ko'k</div>
+                    <div class="chip" onclick="toggleChip(this)">Sariq</div>
                 </div>
             </div>
 
-            <button class="btn-save" onclick="handleSave()">Bazaga saqlash</button>
-            <button onclick="closeAddModal()" style="width:100%; background:none; border:none; color:#888; margin-top:10px;">Bekor qilish</button>
+            <button class="btn-confirm" style="background: var(--primary); color: #000;" onclick="saveProductToDB()">
+                BAZAGA SAQLASH
+            </button>
+            <button class="btn-delete" onclick="closeAddModal()" style="color: #666;">Bekor qilish</button>
         </div>
     </div>
 
-    <div id="resultModal" class="modal">
-        <div class="modal-content" id="scan-res-body"></div>
+    <div id="previewModal" class="modal">
+        <div class="modal-content" style="text-align: center; border-top-color: var(--accent);">
+            <div id="pre-img-container"></div>
+            
+            <h2 id="pre-title" style="margin-top: 15px;"></h2>
+            <p id="pre-description" style="color: var(--text-gray); font-size: 14px; margin-bottom: 10px;"></p>
+            
+            <div id="pre-tags" style="margin-bottom: 15px;"></div>
+
+            <div class="qr-wrapper">
+                <div id="pre-qrcode"></div>
+                <p style="color: #000; font-size: 10px; margin-top: 5px; font-weight: bold;" id="pre-id-text"></p>
+            </div>
+
+            <div style="font-size: 24px; font-weight: 900; color: var(--primary);" id="pre-price-text"></div>
+            
+            <button class="btn-confirm" id="confirm-sale-btn">SOTUVNI TASDIQLASH</button>
+            <button class="btn-delete" onclick="deleteCurrentProduct()">Mahsulotni o'chirish</button>
+            <button onclick="document.getElementById('previewModal').style.display='none'" style="background: none; border:none; color:#888; margin-top:15px; width:100%;">Yopish</button>
+        </div>
     </div>
 
     <script>
-        let inventory = JSON.parse(localStorage.getItem('lx_inv')) || [];
-        let sales = JSON.parse(localStorage.getItem('lx_sales')) || [];
-        let scanner = null;
-        let selSize = "", selColor = "";
+        /* ================= JS LOGIKA (ERINMASDAN YOZILDI) ================= */
 
-        function showTab(id, btn) {
+        let db_inventory = JSON.parse(localStorage.getItem('lux_inv_v3')) || [];
+        let db_sales = JSON.parse(localStorage.getItem('lux_sales_v3')) || [];
+        let html5QrCode = null;
+        let selectedBase64Img = null;
+        let activeId = null;
+
+        // 1. Tablarni almashtirish
+        function switchTab(id, btn) {
             document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
             document.getElementById(id).classList.add('active');
             btn.classList.add('active');
-            if(id === 'admin') renderProducts();
-            if(id === 'tahlil') renderStats();
-            if(scanner) { scanner.stop(); scanner = null; }
+            
+            if(id === 'admin-sec') renderKatalog();
+            if(id === 'tahlil-sec') renderStats();
+            if(html5QrCode) stopCamera();
         }
 
-        function updateVal(id, val) {
+        // 2. Form funksiyalari
+        function openAddModal() { document.getElementById('addModal').style.display = 'flex'; }
+        function closeAddModal() { document.getElementById('addModal').style.display = 'none'; resetForm(); }
+
+        function updateRangeLabel(id, val) {
             document.getElementById(id).innerText = parseInt(val).toLocaleString();
         }
 
-        function selectChip(el, type) {
-            el.parentElement.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
-            el.classList.add('active');
-            if(type === 'size') selSize = el.innerText;
-            if(type === 'color') selColor = el.innerText;
+        function toggleChip(el) { el.classList.toggle('selected'); }
+
+        function handleImgSelect(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    selectedBase64Img = e.target.result;
+                    const btn = document.getElementById('img-preview-btn');
+                    btn.classList.add('previewed');
+                    btn.innerHTML = `<img src="${selectedBase64Img}" style="width:100%; height:100%; object-fit:cover; border-radius:12px;">`;
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
         }
 
-        function openAddModal() { document.getElementById('addModal').style.display = 'flex'; }
-        function closeAddModal() { document.getElementById('addModal').style.display = 'none'; }
+        function resetForm() {
+            document.getElementById('p-name').value = "";
+            document.getElementById('p-desc').value = "";
+            document.querySelectorAll('.chip').forEach(c => c.classList.remove('selected'));
+            document.getElementById('img-preview-btn').classList.remove('previewed');
+            document.getElementById('img-preview-btn').innerHTML = `<i class="fas fa-cloud-upload-alt"></i><span>Rasm yuklash</span>`;
+            selectedBase64Img = null;
+        }
 
-        function handleSave() {
+        // 3. Mahsulotni saqlash
+        function saveProductToDB() {
             const name = document.getElementById('p-name').value;
-            const price = document.getElementById('p-price').value;
-            const cost = document.getElementById('p-cost').value;
+            const desc = document.getElementById('p-desc').value;
+            const price = parseInt(document.getElementById('p-price').value);
+            const cost = parseInt(document.getElementById('p-cost').value);
+            
+            const sizes = Array.from(document.querySelectorAll('#size-chips .selected')).map(c => c.innerText);
+            const colors = Array.from(document.querySelectorAll('#color-chips .selected')).map(c => c.innerText);
 
-            if(!name || !selSize || !selColor) return alert("Ma'lumotlarni to'liq tanlang!");
+            if(!name || !selectedBase64Img || sizes.length === 0 || colors.length === 0) {
+                alert("Iltimos, nom, rasm, kamida bitta o'lcham va rangni tanlang!");
+                return;
+            }
 
             const product = {
-                id: "LX" + Date.now(),
-                name, price: parseInt(price), cost: parseInt(cost),
-                size: selSize, color: selColor
+                id: "LX" + Math.floor(Math.random() * 1000000),
+                name, desc, price, cost, sizes, colors,
+                img: selectedBase64Img,
+                createdAt: new Date().toISOString()
             };
 
-            inventory.push(product);
-            localStorage.setItem('lx_inv', JSON.stringify(inventory));
+            db_inventory.push(product);
+            localStorage.setItem('lux_inv_v3', JSON.stringify(db_inventory));
+            
+            alert("Mahsulot muvaffaqiyatli qo'shildi!");
             closeAddModal();
-            renderProducts();
+            renderKatalog();
         }
 
-        function renderProducts() {
+        // 4. Katalog render
+        function renderKatalog() {
             const list = document.getElementById('product-list');
             list.innerHTML = "";
-            inventory.forEach(p => {
-                const div = document.createElement('div');
-                div.className = 'product-card';
-                div.innerHTML = `
-                    <div class="qr-small" id="qr-${p.id}"></div>
-                    <div class="card-info">
+            document.getElementById('items-count').innerText = db_inventory.length + " mahsulot";
+
+            db_inventory.sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt)).forEach(p => {
+                const card = document.createElement('div');
+                card.className = 'product-card';
+                card.onclick = () => openPreview(p.id);
+                card.innerHTML = `
+                    <div class="product-img"><img src="${p.img}"></div>
+                    <div class="product-info">
                         <h4>${p.name}</h4>
-                        <p>${p.price.toLocaleString()} so'm</p>
-                        <div class="tags-row">
-                            <span class="tag">${p.size}</span>
-                            <span class="tag">${p.color}</span>
-                        </div>
+                        <div class="price">${p.price.toLocaleString()} so'm</div>
                     </div>
-                    <i class="fas fa-trash-alt delete-icon" onclick="deleteItem('${p.id}')"></i>
                 `;
-                list.appendChild(div);
-                new QRCode(document.getElementById(`qr-${p.id}`), { text: p.id, width: 85, height: 85 });
+                list.appendChild(card);
             });
         }
 
-        function deleteItem(id) {
-            if(confirm("O'chirilsinmi?")) {
-                inventory = inventory.filter(i => i.id !== id);
-                localStorage.setItem('lx_inv', JSON.stringify(inventory));
-                renderProducts();
-            }
+        // 5. Batafsil ko'rish (Preview)
+        function openPreview(id) {
+            const p = db_inventory.find(i => i.id === id);
+            if(!p) return;
+            activeId = id;
+
+            document.getElementById('pre-img-container').innerHTML = `<img src="${p.img}" class="preview-img">`;
+            document.getElementById('pre-title').innerText = p.name;
+            document.getElementById('pre-description').innerText = p.desc || "Tavsif berilmagan";
+            document.getElementById('pre-price-text').innerText = p.price.toLocaleString() + " so'm";
+            document.getElementById('pre-id-text').innerText = "ID: " + p.id;
+            
+            document.getElementById('pre-tags').innerHTML = `
+                ${p.sizes.map(s => `<span class="chip selected" style="padding: 4px 10px; font-size:10px;">${s}</span>`).join('')}
+                ${p.colors.map(c => `<span class="chip selected" style="padding: 4px 10px; font-size:10px; background:#444; color:#fff;">${c}</span>`).join('')}
+            `;
+
+            document.getElementById('pre-qrcode').innerHTML = "";
+            new QRCode(document.getElementById('pre-qrcode'), { text: p.id, width: 180, height: 180 });
+
+            document.getElementById('confirm-sale-btn').onclick = () => confirmSale(p.id);
+            document.getElementById('previewModal').style.display = 'flex';
         }
 
-        function toggleCamera() {
-            if(scanner) { scanner.stop(); scanner = null; return; }
-            scanner = new Html5Qrcode("reader");
-            scanner.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 }, (text) => {
-                const p = inventory.find(i => i.id === text);
-                const resBody = document.getElementById('scan-res-body');
-                if(p) {
-                    resBody.innerHTML = `
-                        <h2 style="color:var(--accent)">Topildi!</h2>
-                        <div style="margin:20px 0; padding:15px; background:#1a1a1a; border-radius:15px;">
-                            <h3>${p.name}</h3>
-                            <p style="font-size:22px; color:var(--primary); margin:10px 0;">${p.price.toLocaleString()} so'm</p>
-                            <p>O'lcham: ${p.size} | Rang: ${p.color}</p>
-                        </div>
-                        <button class="btn-save" style="background:var(--accent)" onclick="confirmSale('${p.id}')">Sotuvni tasdiqlash</button>
-                        <button onclick="closeRes()" style="width:100%; background:none; border:none; color:#888; margin-top:10px;">Yopish</button>
-                    `;
-                } else {
-                    resBody.innerHTML = `<h2>Topilmadi</h2><button class="btn-save" onclick="closeRes()">Yopish</button>`;
+        // 6. Skanerlash (Kamera & Galereya)
+        function startCamera() {
+            html5QrCode = new Html5Qrcode("reader");
+            html5QrCode.start(
+                { facingMode: "environment" }, 
+                { fps: 10, qrbox: { width: 250, height: 250 } },
+                (decodedText) => {
+                    stopCamera();
+                    openPreview(decodedText);
                 }
-                document.getElementById('resultModal').style.display = 'flex';
-                scanner.stop(); scanner = null;
-            });
+            ).catch(err => alert("Kamera xatosi: " + err));
         }
 
-        function confirmSale(id) {
-            const idx = inventory.findIndex(i => i.id === id);
-            if(idx > -1) {
-                const sold = inventory.splice(idx, 1)[0];
-                sales.push({...sold, date: new Date().toISOString()});
-                localStorage.setItem('lx_inv', JSON.stringify(inventory));
-                localStorage.setItem('lx_sales', JSON.stringify(sales));
-                alert("Sotildi!");
-                closeRes();
-                renderProducts();
+        function stopCamera() {
+            if(html5QrCode) {
+                html5QrCode.stop().then(() => { html5QrCode = null; });
             }
         }
 
-        function closeRes() { document.getElementById('resultModal').style.display = 'none'; }
-
-        function renderStats() {
-            const total = sales.reduce((a, b) => a + b.price, 0);
-            const profit = sales.reduce((a, b) => a + (b.price - b.cost), 0);
-            document.getElementById('total-sales').innerText = total.toLocaleString() + " so'm";
-            document.getElementById('net-profit').innerText = profit.toLocaleString() + " so'm";
-            document.getElementById('items-sold').innerText = sales.length + " ta";
+        function scanFromGallery(input) {
+            if (input.files && input.files[0]) {
+                const scanner = new Html5Qrcode("reader");
+                scanner.scanFile(input.files[0], true)
+                .then(decodedText => openPreview(decodedText))
+                .catch(err => alert("Rasmda QR kod topilmadi!"));
+            }
         }
 
-        window.onload = renderProducts;
+        // 7. Sotuv va O'chirish
+        function confirmSale(id) {
+            if(confirm("Ushbu mahsulot sotilganini tasdiqlaysizmi?")) {
+                const index = db_inventory.findIndex(p => p.id === id);
+                if(index > -1) {
+                    const soldItem = db_inventory.splice(index, 1)[0];
+                    db_sales.push({ ...soldItem, soldAt: new Date().toISOString() });
+                    
+                    localStorage.setItem('lux_inv_v3', JSON.stringify(db_inventory));
+                    localStorage.setItem('lux_sales_v3', JSON.stringify(db_sales));
+                    
+                    document.getElementById('previewModal').style.display = 'none';
+                    renderKatalog();
+                    alert("Sotuv muvaffaqiyatli qayd etildi!");
+                }
+            }
+        }
+
+        function deleteCurrentProduct() {
+            if(confirm("Haqiqatan ham o'chirmoqchimisiz?")) {
+                db_inventory = db_inventory.filter(p => p.id !== activeId);
+                localStorage.setItem('lux_inv_v3', JSON.stringify(db_inventory));
+                document.getElementById('previewModal').style.display = 'none';
+                renderKatalog();
+            }
+        }
+
+        // 8. Statistika
+        function renderStats() {
+            const totalRevenue = db_sales.reduce((sum, item) => sum + item.price, 0);
+            const totalCost = db_sales.reduce((sum, item) => sum + item.cost, 0);
+            const netProfit = totalRevenue - totalCost;
+
+            document.getElementById('stat-total-sales').innerText = totalRevenue.toLocaleString() + " so'm";
+            document.getElementById('stat-net-profit').innerText = netProfit.toLocaleString() + " so'm";
+            document.getElementById('stat-items-sold').innerText = db_sales.length + " ta";
+        }
+
+        window.onload = renderKatalog;
     </script>
 </body>
 </html>
