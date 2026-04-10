@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>LuxWear Premium | QR Management</title>
+    
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary: #FFD700; /* Oltin rang */
+            --bg: #000000;
+            --card-bg: #121212;
+            --text-main: #FFFFFF;
+            --text-gray: #888888;
+            --accent: #1DB954;
+            --danger: #FF4D4D;
+        }
+
+        * {
+            margin: 0; padding: 0; box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-main);
+            min-height: 100vh;
+        }
+
+        /* --- Header --- */
+        header {
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #222;
+            position: sticky; top: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); z-index: 100;
+        }
+
+        .logo-area { display: flex; align-items: center; gap: 12px; }
+        .logo-box {
+            background: var(--primary); color: #000;
+            padding: 8px 12px; font-weight: 800; border-radius: 8px; font-size: 20px;
+        }
+        .logo-text h1 { font-size: 18px; letter-spacing: 1px; }
+        .logo-text p { font-size: 10px; color: var(--text-gray); text-transform: uppercase; }
+
+        /* --- Navigation --- */
+        nav {
+            position: fixed; bottom: 0; width: 100%;
+            background: #000; border-top: 1px solid #222;
+            display: flex; justify-content: space-around; padding: 15px 0; z-index: 100;
+        }
+        .nav-btn {
+            background: none; border: none; color: var(--text-gray);
+            font-size: 12px; cursor: pointer; transition: 0.3s;
+            display: flex; flex-direction: column; align-items: center; gap: 5px;
+        }
+        .nav-btn i { font-size: 20px; }
+        .nav-btn.active { color: var(--primary); }
+
+        /* --- Content Sections --- */
+        .section { display: none; padding: 20px; padding-bottom: 100px; animation: fadeIn 0.4s ease; }
+        .section.active { display: block; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- Scanner Styling --- */
+        .scanner-card {
+            background: var(--card-bg); border-radius: 20px; padding: 20px; text-align: center;
+            border: 1px solid #333; margin-top: 20px;
+        }
+        #reader { width: 100%; border-radius: 15px; overflow: hidden; margin: 15px 0; border: 1px dashed var(--primary); }
+        .camera-btn {
+            background: var(--primary); color: #000; width: 100%; padding: 15px;
+            border-radius: 12px; font-weight: bold; border: none; margin-top: 15px; cursor: pointer;
+        }
+
+        /* --- Admin & Grid Styling --- */
+        .admin-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .add-btn { background: var(--primary); color: #000; padding: 10px 15px; border-radius: 8px; border: none; font-weight: bold; }
+        
+        .product-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .product-card {
+            background: var(--card-bg); border-radius: 15px; padding: 15px; border: 1px solid #222;
+            transition: 0.3s; position: relative;
+        }
+        .product-card h4 { font-size: 16px; margin-bottom: 5px; }
+        .product-card p { color: var(--primary); font-weight: bold; font-size: 14px; }
+        .product-card .size-tags { display: flex; gap: 5px; margin-top: 8px; }
+        .tag { background: #333; padding: 2px 6px; border-radius: 4px; font-size: 10px; }
+        .delete-icon { position: absolute; top: 10px; right: 10px; color: var(--danger); cursor: pointer; }
+
+        /* --- Modal Styling --- */
+        .modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9); z-index: 1000; display: none;
+            justify-content: center; align-items: center;
+        }
+        .modal-content {
+            background: var(--card-bg); width: 90%; max-width: 450px;
+            padding: 25px; border-radius: 25px; border: 1px solid #333;
+            max-height: 90vh; overflow-y: auto;
+        }
+        .modal-content h3 { margin-bottom: 20px; color: var(--primary); }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-size: 12px; color: var(--text-gray); margin-bottom: 5px; }
+        input, textarea {
+            width: 100%; background: #1a1a1a; border: 1px solid #333; color: #fff;
+            padding: 12px; border-radius: 10px; outline: none;
+        }
+        .btn-save { background: var(--primary); color: #000; width: 100%; padding: 15px; border-radius: 10px; border: none; font-weight: bold; margin-top: 10px; }
+        .btn-cancel { background: transparent; color: var(--text-gray); width: 100%; padding: 10px; border: none; margin-top: 5px; }
+
+        /* --- Stats Styling --- */
+        .stats-summary { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
+        .stat-item { background: var(--card-bg); padding: 20px; border-radius: 18px; border: 1px solid #222; }
+        .stat-item span { font-size: 12px; color: var(--text-gray); }
+        .stat-item h2 { margin-top: 5px; color: var(--primary); }
+
+        #qr-download-area { text-align: center; margin-top: 15px; padding: 10px; background: #fff; border-radius: 10px; display: none; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo-area">
+            <div class="logo-box">LX</div>
+            <div class="logo-text">
+                <h1>LuxWear</h1>
+                <p>Premium Boutique</p>
+            </div>
+        </div>
+        <i class="fas fa-bell" style="color: var(--primary)"></i>
+    </header>
+
+    <section id="scanner" class="section active">
+        <div class="scanner-card">
+            <h2>Mahsulotni skanerlang</h2>
+            <p style="color: var(--text-gray); font-size: 13px; margin-top: 5px;">Kiyimdagi QR kodni markazga keltiring</p>
+            <div id="reader"></div>
+            <button class="camera-btn" onclick="toggleCamera()">
+                <i class="fas fa-camera"></i> Kamerani yoqish
+            </button>
+        </div>
+    </section>
+
+    <section id="admin" class="section">
+        <div class="admin-controls">
+            <h2>Mahsulotlar</h2>
+            <button class="add-btn" onclick="openAddModal()">+ Yangi mahsulot</button>
+        </div>
+        <div id="product-list" class="product-grid">
+            </div>
+    </section>
+
+    <section id="tahlil" class="section">
+        <h2>Daromad tahlili</h2>
+        <div class="stats-summary">
+            <div class="stat-item">
+                <span>Jami savdo</span>
+                <h2 id="total-sales">0 so'm</h2>
+            </div>
+            <div class="stat-item">
+                <span>Sof foyda</span>
+                <h2 id="net-profit">0 so'm</h2>
+            </div>
+            <div class="stat-item">
+                <span>Sotilgan tovar</span>
+                <h2 id="items-sold">0 ta</h2>
+            </div>
+            <div class="stat-item">
+                <span>O'rtacha narx</span>
+                <h2 id="avg-price">0 so'm</h2>
+            </div>
+        </div>
+    </section>
+
+    <nav>
+        <button class="nav-btn active" onclick="showTab('scanner')">
+            <i class="fas fa-qrcode"></i><span>Skaner</span>
+        </button>
+        <button class="nav-btn" onclick="showTab('admin')">
+            <i class="fas fa-box"></i><span>Admin</span>
+        </button>
+        <button class="nav-btn" onclick="showTab('tahlil')">
+            <i class="fas fa-chart-line"></i><span>Tahlil</span>
+        </button>
+    </nav>
+
+    <div id="addModal" class="modal">
+        <div class="modal-content">
+            <h3>Yangi kiyim qo'shish</h3>
+            <div class="form-group">
+                <label>Mahsulot nomi</label>
+                <input type="text" id="p-name" placeholder="Masalan: Erkaklar ko'ylagi">
+            </div>
+            <div class="form-group">
+                <label>Tavsif</label>
+                <textarea id="p-desc" rows="2"></textarea>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <div class="form-group">
+                    <label>Sotish narxi</label>
+                    <input type="number" id="p-price">
+                </div>
+                <div class="form-group">
+                    <label>Tan narxi</label>
+                    <input type="number" id="p-cost">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>O'lchamlar (vergul bilan)</label>
+                <input type="text" id="p-sizes" placeholder="S, M, L, XL">
+            </div>
+            <div class="form-group">
+                <label>Ranglar</label>
+                <input type="text" id="p-colors" placeholder="Qora, Oq, Ko'k">
+            </div>
+            
+            <div id="qr-download-area">
+                <p style="color: #000; font-size: 10px; margin-bottom: 5px;">QR KOD YARATILDI:</p>
+                <div id="qrcode" style="display: flex; justify-content: center;"></div>
+            </div>
+
+            <button class="btn-save" id="save-btn" onclick="handleSave()">Saqlash va QR yaratish</button>
+            <button class="btn-cancel" onclick="closeAddModal()">Bekor qilish</button>
+        </div>
+    </div>
+
+    <div id="resultModal" class="modal">
+        <div class="modal-content">
+            <h3 id="res-name">Mahsulot topildi!</h3>
+            <div style="margin: 15px 0; border-top: 1px solid #333; padding-top: 15px;">
+                <p id="res-desc" style="color: var(--text-gray); font-size: 14px; margin-bottom: 10px;"></p>
+                <p>Narxi: <span id="res-price" style="color: var(--primary); font-size: 20px; font-weight: bold;"></span></p>
+                <p style="margin-top: 10px;">O'lchamlar: <span id="res-sizes"></span></p>
+                <p>Ranglar: <span id="res-colors"></span></p>
+            </div>
+            <button class="btn-save" onclick="processSale()" style="background: var(--accent);">
+                Sotildi (Bazadan o'chirish)
+            </button>
+            <button class="btn-cancel" onclick="closeResultModal()">Yopish</button>
+        </div>
+    </div>
+
+    <script>
+        // --- MA'LUMOTLAR BAZASI (LocalStorage) ---
+        let inventory = JSON.parse(localStorage.getItem('lx_inv')) || [];
+        let salesHistory = JSON.parse(localStorage.getItem('lx_sales')) || [];
+        let scanner = null;
+        let currentScannedId = null;
+
+        // --- TABLARNI BOSHQARISH ---
+        function showTab(tabId) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            event.currentTarget.classList.add('active');
+            
+            if(tabId === 'admin') renderProducts();
+            if(tabId === 'tahlil') renderStats();
+            if(scanner) { scanner.stop(); scanner = null; }
+        }
+
+        // --- SKANER FUNKSIYALARI ---
+        function toggleCamera() {
+            if (scanner) {
+                scanner.stop();
+                scanner = null;
+                document.querySelector('.camera-btn').innerHTML = '<i class="fas fa-camera"></i> Kamerani yoqish';
+            } else {
+                scanner = new Html5Qrcode("reader");
+                const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+                
+                scanner.start({ facingMode: "environment" }, config, (decodedText) => {
+                    handleScanSuccess(decodedText);
+                    scanner.stop();
+                }).catch(err => {
+                    alert("Kamera ruxsati berilmadi. Sozlamalardan 'Allow Camera' ni tanlang.");
+                });
+                
+                document.querySelector('.camera-btn').innerHTML = '<i class="fas fa-stop"></i> Kamerani o‘chirish';
+            }
+        }
+
+        function handleScanSuccess(id) {
+            const product = inventory.find(p => p.id === id);
+            if (product) {
+                currentScannedId = id;
+                document.getElementById('res-name').innerText = product.name;
+                document.getElementById('res-desc').innerText = product.desc;
+                document.getElementById('res-price').innerText = product.price.toLocaleString() + " so'm";
+                document.getElementById('res-sizes').innerText = product.sizes;
+                document.getElementById('res-colors').innerText = product.colors;
+                document.getElementById('resultModal').style.display = 'flex';
+            } else {
+                alert("Xato: Mahsulot bazada topilmadi!");
+            }
+        }
+
+        // --- MAHSULOT QO'SHISH ---
+        function openAddModal() { document.getElementById('addModal').style.display = 'flex'; }
+        function closeAddModal() { 
+            document.getElementById('addModal').style.display = 'none';
+            document.getElementById('qr-download-area').style.display = 'none';
+            document.getElementById('save-btn').style.display = 'block';
+        }
+
+        function handleSave() {
+            const id = "LX" + Date.now();
+            const product = {
+                id: id,
+                name: document.getElementById('p-name').value,
+                desc: document.getElementById('p-desc').value,
+                price: parseFloat(document.getElementById('p-price').value),
+                cost: parseFloat(document.getElementById('p-cost').value),
+                sizes: document.getElementById('p-sizes').value,
+                colors: document.getElementById('p-colors').value
+            };
+
+            if(!product.name || !product.price) return alert("Nom va narxni kiriting!");
+
+            inventory.push(product);
+            localStorage.setItem('lx_inv', JSON.stringify(inventory));
+
+            // QR Kod yaratish
+            document.getElementById('qrcode').innerHTML = "";
+            new QRCode(document.getElementById('qrcode'), { text: id, width: 150, height: 150 });
+            document.getElementById('qr-download-area').style.display = 'block';
+            document.getElementById('save-btn').style.display = 'none';
+            
+            renderProducts();
+        }
+
+        // --- SOTISH VA O'CHIRISH ---
+        function processSale() {
+            const index = inventory.findIndex(p => p.id === currentScannedId);
+            if (index > -1) {
+                const soldItem = inventory.splice(index, 1)[0];
+                soldItem.saleDate = new Date().toISOString();
+                salesHistory.push(soldItem);
+                
+                localStorage.setItem('lx_inv', JSON.stringify(inventory));
+                localStorage.setItem('lx_sales', JSON.stringify(salesHistory));
+                
+                alert("Muvaffaqiyatli sotildi!");
+                closeResultModal();
+                renderProducts();
+            }
+        }
+
+        function deleteProduct(id) {
+            if(confirm("Ushbu mahsulotni butunlay o'chirmoqchimisiz?")) {
+                inventory = inventory.filter(p => p.id !== id);
+                localStorage.setItem('lx_inv', JSON.stringify(inventory));
+                renderProducts();
+            }
+        }
+
+        // --- RENDER (CHIZISH) FUNKSIYALARI ---
+        function renderProducts() {
+            const list = document.getElementById('product-list');
+            list.innerHTML = "";
+            inventory.forEach(p => {
+                list.innerHTML += `
+                    <div class="product-card">
+                        <i class="fas fa-trash delete-icon" onclick="deleteProduct('${p.id}')"></i>
+                        <h4>${p.name}</h4>
+                        <p>${p.price.toLocaleString()} so'm</p>
+                        <div class="size-tags">
+                            ${p.sizes.split(',').map(s => `<span class="tag">${s.trim()}</span>`).join('')}
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function renderStats() {
+            const total = salesHistory.reduce((a, b) => a + b.price, 0);
+            const cost = salesHistory.reduce((a, b) => a + (b.cost || 0), 0);
+            
+            document.getElementById('total-sales').innerText = total.toLocaleString() + " so'm";
+            document.getElementById('net-profit').innerText = (total - cost).toLocaleString() + " so'm";
+            document.getElementById('items-sold').innerText = salesHistory.length + " ta";
+            document.getElementById('avg-price').innerText = 
+                (salesHistory.length ? Math.round(total/salesHistory.length) : 0).toLocaleString() + " so'm";
+        }
+
+        function closeResultModal() { document.getElementById('resultModal').style.display = 'none'; }
+    </script>
+</body>
+</html>
