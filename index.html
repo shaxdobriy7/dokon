@@ -3,634 +3,1017 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>LuxWear Premium | Management System v3.0</title>
+    <title>LuxWear Enterprise ERP v6.0 | Full Edition</title>
     
     <script src="https://unpkg.com/html5-qrcode"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <style>
-        /* 1. ASOSIY RANG VA O'ZGARUVCHILAR */
+        /* 1. ASOSIY DIZAYN VA O'ZGARUVCHILAR */
         :root {
-            --primary: #FFD700;
-            --primary-dark: #ccac00;
-            --bg: #000000;
-            --card-bg: #121212;
-            --input-bg: #1a1a1a;
-            --text-main: #FFFFFF;
-            --text-gray: #888888;
-            --accent: #1DB954;
-            --danger: #FF4D4D;
-            --glass: rgba(255, 255, 255, 0.05);
-            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --gold: #FFD700;
+            --dark-gold: #b8860b;
+            --black: #000000;
+            --dark-gray: #121212;
+            --light-gray: #1a1a1a;
+            --text-white: #FFFFFF;
+            --text-muted: #888888;
+            --success: #1DB954;
+            --error: #FF4D4D;
+            --warning: #FFA500;
+            --shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8);
         }
 
-        /* 2. UMUMIY STYLES */
         * {
-            margin: 0; padding: 0; box-sizing: border-box;
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', 'Segoe UI', Roboto, sans-serif;
             -webkit-tap-highlight-color: transparent;
         }
 
         body {
-            background-color: var(--bg);
-            color: var(--text-main);
+            background-color: var(--black);
+            color: var(--text-white);
             min-height: 100vh;
+            line-height: 1.5;
             overflow-x: hidden;
-            line-height: 1.6;
         }
 
-        /* 3. HEADER & LOGO */
+        /* 2. HEADER QISMI */
         header {
-            padding: 20px;
+            padding: 25px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            background: linear-gradient(to bottom, #111, #000);
             border-bottom: 1px solid #222;
             position: sticky;
             top: 0;
-            background: rgba(0,0,0,0.85);
-            backdrop-filter: blur(15px);
             z-index: 1000;
+            backdrop-filter: blur(10px);
         }
 
-        .logo-area { display: flex; align-items: center; gap: 15px; }
-        .logo-box {
-            background: linear-gradient(135deg, var(--primary), #b8860b);
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-square {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, var(--gold), var(--dark-gold));
             color: #000;
-            padding: 10px 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             font-weight: 900;
-            border-radius: 12px;
-            font-size: 22px;
-            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
-        }
-        .logo-text h1 { font-size: 20px; letter-spacing: 0.5px; font-weight: 800; }
-        .logo-text p { font-size: 10px; color: var(--text-gray); text-transform: uppercase; letter-spacing: 2px; }
-
-        .header-actions i {
             font-size: 24px;
-            color: var(--primary);
-            cursor: pointer;
-            transition: var(--transition);
+            border-radius: 12px;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.2);
         }
-        .header-actions i:active { transform: scale(0.9); }
 
-        /* 4. NAVIGATSIYA */
+        .brand-text h1 {
+            font-size: 20px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+
+        .brand-text span {
+            font-size: 10px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        /* 3. NAVIGATSIYA */
         nav {
             position: fixed;
             bottom: 0;
             width: 100%;
-            background: rgba(10, 10, 10, 0.95);
+            background: rgba(10, 10, 10, 0.98);
             border-top: 1px solid #222;
             display: flex;
             justify-content: space-around;
-            padding: 12px 0 25px 0; /* Pastki qism iPhone uchun qulayroq */
+            padding: 15px 0 30px 0;
             z-index: 1000;
-            backdrop-filter: blur(20px);
         }
-        .nav-btn {
+
+        .nav-item {
             background: none;
             border: none;
-            color: var(--text-gray);
-            font-size: 11px;
+            color: var(--text-muted);
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
             cursor: pointer;
-            transition: var(--transition);
+            transition: all 0.3s ease;
             width: 25%;
         }
-        .nav-btn i { font-size: 22px; }
-        .nav-btn.active { color: var(--primary); }
-        .nav-btn.active i { transform: translateY(-3px); }
 
-        /* 5. SEKSIYALAR */
-        .section {
+        .nav-item i {
+            font-size: 22px;
+        }
+
+        .nav-item span {
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .nav-item.active {
+            color: var(--gold);
+        }
+
+        /* 4. SECTIONLAR */
+        .page-section {
             display: none;
             padding: 20px;
             padding-bottom: 120px;
-            animation: slideUp 0.4s ease-out;
+            animation: pageEnter 0.5s ease;
         }
-        .section.active { display: block; }
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(20px); }
+
+        @keyframes pageEnter {
+            from { opacity: 0; transform: translateY(15px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* 6. SKANERLASH BO'LIMI */
-        .scanner-container {
-            background: var(--card-bg);
-            border-radius: 25px;
-            padding: 25px;
-            border: 1px solid #333;
-            text-align: center;
+        .page-section.active {
+            display: block;
         }
-        #reader {
-            width: 100%;
-            border-radius: 20px;
-            overflow: hidden;
-            border: 2px dashed #444;
-            background: #000;
-            margin-bottom: 20px;
-        }
-        .scanner-buttons {
+
+        /* 5. STATISTIKA KARTALARI */
+        .stats-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 15px;
+            margin-bottom: 20px;
         }
-        .btn-scan {
-            padding: 15px;
-            border-radius: 15px;
-            border: none;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            cursor: pointer;
-            transition: var(--transition);
-        }
-        .btn-cam { background: var(--primary); color: #000; }
-        .btn-gal { background: #222; color: #fff; border: 1px solid #444; }
 
-        /* 7. ADMIN / KATALOG */
-        .admin-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
+        .main-stat-card {
+            grid-column: span 2;
+            background: var(--dark-gray);
+            padding: 25px;
+            border-radius: 24px;
+            border: 1px solid #222;
+            position: relative;
+            overflow: hidden;
         }
-        .product-grid {
+
+        .main-stat-card::after {
+            content: '';
+            position: absolute;
+            top: 0; right: 0;
+            width: 100px; height: 100px;
+            background: var(--gold);
+            filter: blur(80px);
+            opacity: 0.1;
+        }
+
+        .stat-label {
+            color: var(--text-muted);
+            font-size: 14px;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--gold);
+        }
+
+        .sub-stat-card {
+            background: var(--dark-gray);
+            padding: 20px;
+            border-radius: 20px;
+            border: 1px solid #222;
+        }
+
+        .sub-stat-value {
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        /* 6. MAHSULOTLAR RO'YXATI */
+        .catalog-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 15px;
         }
-        .product-card {
-            background: var(--card-bg);
+
+        .product-item {
+            background: var(--dark-gray);
+            border-radius: 20px;
+            border: 1px solid #222;
+            overflow: hidden;
+            position: relative;
+            transition: transform 0.2s;
+        }
+
+        .product-item:active {
+            transform: scale(0.97);
+        }
+
+        .stock-tag {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            padding: 5px 10px;
+            border-radius: 8px;
+            font-size: 10px;
+            font-weight: 700;
+            z-index: 10;
+            backdrop-filter: blur(5px);
+        }
+
+        .tag-normal { background: rgba(29, 185, 84, 0.8); color: white; }
+        .tag-warning { background: rgba(255, 165, 0, 0.9); color: black; animation: blink 1s infinite; }
+
+        @keyframes blink {
+            50% { opacity: 0.6; }
+        }
+
+        .img-container {
+            width: 100%;
+            aspect-ratio: 1;
+            background: #1a1a1a;
+        }
+
+        .img-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .product-details {
+            padding: 15px;
+        }
+
+        .product-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 5px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .product-price {
+            color: var(--gold);
+            font-weight: 800;
+            font-size: 16px;
+        }
+
+        /* 7. FORM ELEMENTLARI */
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        input, select, textarea {
+            width: 100%;
+            background: var(--light-gray);
+            border: 1px solid #333;
+            color: white;
+            padding: 15px;
+            border-radius: 12px;
+            font-size: 16px;
+            outline: none;
+            transition: border 0.3s;
+        }
+
+        input:focus {
+            border-color: var(--gold);
+        }
+
+        /* 8. MODAL OYNALAR */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 2000;
+            display: none;
+            justify-content: center;
+            align-items: flex-end;
+        }
+
+        .modal-box {
+            width: 100%;
+            max-width: 550px;
+            background: #111;
+            border-radius: 30px 30px 0 0;
+            padding: 30px 20px;
+            max-height: 92vh;
+            overflow-y: auto;
+            border-top: 4px solid var(--gold);
+        }
+
+        /* 9. VARIANTLAR JADVALI */
+        .variant-row {
+            display: grid;
+            grid-template-columns: 2fr 1.5fr 1fr 40px;
+            gap: 10px;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+
+        .add-row-btn {
+            background: transparent;
+            border: 1.5px dashed var(--gold);
+            color: var(--gold);
+            width: 100%;
+            padding: 12px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            margin: 10px 0 20px 0;
+        }
+
+        /* 10. TUGMALAR */
+        .btn-primary {
+            width: 100%;
+            padding: 18px;
+            background: var(--gold);
+            color: black;
+            border: none;
+            border-radius: 15px;
+            font-size: 16px;
+            font-weight: 800;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+
+        .btn-secondary {
+            width: 100%;
+            padding: 15px;
+            background: #222;
+            color: white;
+            border: none;
+            border-radius: 15px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn-danger {
+            background: var(--error);
+            color: white;
+        }
+
+        .btn-excel {
+            background: #1D6F42;
+            color: white;
+        }
+
+        /* 11. OGOHLANTIRISH PANELI */
+        .alert-panel {
+            background: rgba(255, 165, 0, 0.1);
+            border: 1px solid var(--warning);
+            padding: 15px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .alert-header {
+            color: var(--warning);
+            font-weight: 800;
+            font-size: 14px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .alert-item {
+            font-size: 12px;
+            margin-bottom: 5px;
+            color: #ddd;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        /* 12. QR SCANNER */
+        #qr-video-container {
+            width: 100%;
             border-radius: 20px;
             overflow: hidden;
-            border: 1px solid #222;
-            transition: var(--transition);
-            position: relative;
-        }
-        .product-card:active { transform: scale(0.97); }
-        
-        .product-img {
-            width: 100%;
-            aspect-ratio: 1/1.1;
-            background: #1a1a1a;
-            position: relative;
-        }
-        .product-img img { width: 100%; height: 100%; object-fit: cover; }
-        
-        .product-info { padding: 12px; }
-        .product-info h4 { font-size: 14px; font-weight: 600; margin-bottom: 5px; color: #eee; }
-        .product-info .price { color: var(--primary); font-weight: 800; font-size: 15px; }
-        
-        /* 8. FORMA ELEMENTLARI */
-        .modal {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.9); z-index: 2000; display: none;
-            justify-content: center; align-items: flex-end;
-        }
-        .modal-content {
-            background: var(--card-bg);
-            width: 100%;
-            max-width: 500px;
-            padding: 30px 20px;
-            border-radius: 30px 30px 0 0;
-            border-top: 2px solid var(--primary);
-            max-height: 90vh;
-            overflow-y: auto;
-            animation: modalSlide 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        @keyframes modalSlide { from { transform: translateY(100%); } to { transform: translateY(0); } }
-
-        .form-group { margin-bottom: 22px; }
-        .form-group label { display: block; font-size: 13px; color: var(--text-gray); margin-bottom: 10px; font-weight: 500; }
-        
-        input[type="text"], textarea, input[type="number"] {
-            width: 100%; background: var(--input-bg); border: 1px solid #333;
-            color: #fff; padding: 14px; border-radius: 12px; outline: none; font-size: 15px;
-        }
-        input:focus { border-color: var(--primary); }
-
-        .range-box {
-            background: #1a1a1a; padding: 15px; border-radius: 12px; border: 1px solid #333;
-        }
-        .range-header { display: flex; justify-content: space-between; margin-bottom: 10px; }
-        .range-header b { color: var(--primary); }
-        input[type="range"] {
-            width: 100%; height: 6px; background: #444; border-radius: 5px; outline: none; accent-color: var(--primary);
+            background: #000;
+            border: 2px solid #333;
+            margin-bottom: 20px;
         }
 
-        /* Chips (Multiple Select) */
-        .chip-container { display: flex; flex-wrap: wrap; gap: 10px; }
-        .chip {
-            padding: 10px 18px; background: #222; border: 1px solid #333;
-            border-radius: 12px; font-size: 13px; cursor: pointer; transition: 0.2s;
-        }
-        .chip.selected {
-            background: var(--primary); color: #000; font-weight: bold; border-color: var(--primary);
-            box-shadow: 0 4px 10px rgba(255, 215, 0, 0.2);
+        /* 13. FILTRLAR */
+        .filter-scroll {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding-bottom: 15px;
+            margin-bottom: 10px;
         }
 
-        .img-upload-btn {
-            width: 100%; height: 120px; border: 2px dashed #444; border-radius: 15px;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            color: #888; cursor: pointer; transition: 0.3s; background: #0a0a0a;
+        .filter-chip {
+            padding: 8px 18px;
+            background: var(--light-gray);
+            border: 1px solid #333;
+            border-radius: 50px;
+            white-space: nowrap;
+            color: var(--text-muted);
+            font-size: 13px;
         }
-        .img-upload-btn i { font-size: 30px; margin-bottom: 8px; }
-        .img-upload-btn.previewed { border: 2px solid var(--primary); color: var(--primary); }
 
-        /* 9. DETAL KO'RISH (PREVIEW) */
-        .preview-img { width: 100%; border-radius: 20px; margin-bottom: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        .qr-wrapper {
-            background: #fff; padding: 20px; border-radius: 20px; display: inline-block;
-            margin: 20px 0; box-shadow: 0 0 20px rgba(255,255,255,0.1);
+        .filter-chip.active {
+            background: var(--gold);
+            color: black;
+            border-color: var(--gold);
+            font-weight: 700;
         }
-        .btn-confirm {
-            background: var(--accent); color: #fff; width: 100%; padding: 16px;
-            border-radius: 15px; font-weight: 800; border: none; font-size: 16px; margin-top: 15px;
-        }
-        .btn-delete { color: var(--danger); background: none; border: none; margin-top: 20px; font-weight: bold; width: 100%; }
-
-        /* 10. TAHLIL STATISTIKA */
-        .stats-grid { display: grid; grid-template-columns: 1fr; gap: 15px; }
-        .stat-card {
-            background: var(--card-bg); padding: 25px; border-radius: 25px; border: 1px solid #222;
-            position: relative; overflow: hidden;
-        }
-        .stat-card::after {
-            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
-            background: radial-gradient(circle, rgba(255,215,0,0.03) 0%, transparent 70%);
-        }
-        .stat-card span { color: var(--text-gray); font-size: 13px; font-weight: 500; }
-        .stat-card h2 { font-size: 28px; margin-top: 8px; color: var(--primary); letter-spacing: -1px; }
-
     </style>
 </head>
 <body>
 
     <header>
-        <div class="logo-area">
-            <div class="logo-box">LX</div>
-            <div class="logo-text">
-                <h1>LuxWear</h1>
-                <p>Management System</p>
+        <div class="brand">
+            <div class="logo-square">LX</div>
+            <div class="brand-text">
+                <h1>LuxWear Pro</h1>
+                <span>Advanced ERP System</span>
             </div>
         </div>
-        <div class="header-actions">
-            <i class="fas fa-plus-circle" onclick="openAddModal()"></i>
+        <div onclick="openModal('modal-add')">
+            <i class="fas fa-plus-circle" style="font-size: 28px; color: var(--gold);"></i>
         </div>
     </header>
 
-    <section id="scanner-sec" class="section active">
-        <div class="scanner-container">
-            <h2 style="margin-bottom: 10px;">Mahsulot Skaneri</h2>
-            <p style="color: var(--text-gray); font-size: 13px; margin-bottom: 20px;">QR kodni kamera yoki galereya orqali kiriting</p>
-            
-            <div id="reader"></div>
-            
-            <div class="scanner-buttons">
-                <button class="btn-scan btn-cam" onclick="startCamera()">
-                    <i class="fas fa-camera"></i> Kamera
-                </button>
-                <button class="btn-scan btn-gal" onclick="document.getElementById('gallery-input').click()">
-                    <i class="fas fa-image"></i> Galereya
-                </button>
+    <div style="padding: 20px 20px 0 20px;">
+        <div id="low-stock-alert" class="alert-panel">
+            <div class="alert-header">
+                <i class="fas fa-exclamation-triangle"></i> 
+                OMBORDA KAM QOLGAN TOVARLAR
             </div>
-            <input type="file" id="gallery-input" accept="image/*" style="display: none;" onchange="scanFromGallery(this)">
-        </div>
-    </section>
-
-    <section id="admin-sec" class="section">
-        <div class="admin-header">
-            <h2>Katalog</h2>
-            <span id="items-count" style="color: var(--text-gray); font-size: 13px;">0 mahsulot</span>
-        </div>
-        <div id="product-list" class="product-grid">
-            </div>
-    </section>
-
-    <section id="tahlil-sec" class="section">
-        <h2 style="margin-bottom: 20px;">Savdo Statistikasi</h2>
-        <div class="stats-grid">
-            <div class="stat-card">
-                <span>Umumiy Savdo</span>
-                <h2 id="stat-total-sales">0 so'm</h2>
-            </div>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                <div class="stat-card">
-                    <span>Sof Foyda</span>
-                    <h2 id="stat-net-profit" style="color: var(--accent);">0 so'm</h2>
-                </div>
-                <div class="stat-card">
-                    <span>Sotilgan</span>
-                    <h2 id="stat-items-sold">0 ta</h2>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <nav>
-        <button class="nav-btn active" onclick="switchTab('scanner-sec', this)">
-            <i class="fas fa-qrcode"></i><span>Skaner</span>
-        </button>
-        <button class="nav-btn" onclick="switchTab('admin-sec', this)">
-            <i class="fas fa-tshirt"></i><span>Katalog</span>
-        </button>
-        <button class="nav-btn" onclick="switchTab('tahlil-sec', this)">
-            <i class="fas fa-chart-pie"></i><span>Tahlil</span>
-        </button>
-    </nav>
-
-    <div id="addModal" class="modal">
-        <div class="modal-content">
-            <h2 style="margin-bottom: 25px;">Yangi mahsulot</h2>
-            
-            <div class="form-group">
-                <label>Mahsulot rasmi</label>
-                <div class="img-upload-btn" id="img-preview-btn" onclick="document.getElementById('p-img-file').click()">
-                    <i class="fas fa-cloud-upload-alt"></i>
-                    <span>Rasm yuklash</span>
-                </div>
-                <input type="file" id="p-img-file" accept="image/*" style="display: none;" onchange="handleImgSelect(this)">
-            </div>
-
-            <div class="form-group">
-                <label>Nomi</label>
-                <input type="text" id="p-name" placeholder="Masalan: Erkaklar Classic Kostyumi">
-            </div>
-
-            <div class="form-group">
-                <label>Tavsif (Tafsilotlar)</label>
-                <textarea id="p-desc" rows="2" placeholder="Materiali, sifati va boshqalar..."></textarea>
-            </div>
-
-            <div class="form-group">
-                <div class="range-box">
-                    <div class="range-header">Sotish narxi: <b id="val-price">500,000</b> so'm</div>
-                    <input type="range" id="p-price" min="10000" max="5000000" step="10000" value="500000" oninput="updateRangeLabel('val-price', this.value)">
-                </div>
-            </div>
-
-            <div class="form-group">
-                <div class="range-box">
-                    <div class="range-header">Tan narxi (Olib kelingan): <b id="val-cost">350,000</b> so'm</div>
-                    <input type="range" id="p-cost" min="10000" max="5000000" step="10000" value="350000" oninput="updateRangeLabel('val-cost', this.value)">
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label>O'lchamlar (Bir nechtasini tanlang)</label>
-                <div class="chip-container" id="size-chips">
-                    <div class="chip" onclick="toggleChip(this)">S</div>
-                    <div class="chip" onclick="toggleChip(this)">M</div>
-                    <div class="chip" onclick="toggleChip(this)">L</div>
-                    <div class="chip" onclick="toggleChip(this)">XL</div>
-                    <div class="chip" onclick="toggleChip(this)">XXL</div>
-                    <div class="chip" onclick="toggleChip(this)">3XL</div>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label>Ranglar (Bir nechtasini tanlang)</label>
-                <div class="chip-container" id="color-chips">
-                    <div class="chip" onclick="toggleChip(this)">Qora</div>
-                    <div class="chip" onclick="toggleChip(this)">Oq</div>
-                    <div class="chip" onclick="toggleChip(this)">Jigarrang</div>
-                    <div class="chip" onclick="toggleChip(this)">Kulrang</div>
-                    <div class="chip" onclick="toggleChip(this)">Ko'k</div>
-                    <div class="chip" onclick="toggleChip(this)">Sariq</div>
-                </div>
-            </div>
-
-            <button class="btn-confirm" style="background: var(--primary); color: #000;" onclick="saveProductToDB()">
-                BAZAGA SAQLASH
-            </button>
-            <button class="btn-delete" onclick="closeAddModal()" style="color: #666;">Bekor qilish</button>
+            <div id="alert-list"></div>
         </div>
     </div>
 
-    <div id="previewModal" class="modal">
-        <div class="modal-content" style="text-align: center; border-top-color: var(--accent);">
-            <div id="pre-img-container"></div>
-            
-            <h2 id="pre-title" style="margin-top: 15px;"></h2>
-            <p id="pre-description" style="color: var(--text-gray); font-size: 14px; margin-bottom: 10px;"></p>
-            
-            <div id="pre-tags" style="margin-bottom: 15px;"></div>
+    <section id="page-scan" class="page-section active">
+        <div style="text-align: center; margin-bottom: 30px;">
+            <h2 style="font-size: 24px; margin-bottom: 10px;">Mahsulot Sotish</h2>
+            <p style="color: var(--text-muted);">QR kodni skanerlang yoki galereyadan tanlang</p>
+        </div>
 
-            <div class="qr-wrapper">
-                <div id="pre-qrcode"></div>
-                <p style="color: #000; font-size: 10px; margin-top: 5px; font-weight: bold;" id="pre-id-text"></p>
+        <div id="qr-video-container">
+            <div id="qr-reader" style="width: 100%;"></div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+            <button class="btn-primary" onclick="startQRScanner()" style="margin: 0;">
+                <i class="fas fa-camera"></i> Kamera
+            </button>
+            <button class="btn-secondary" onclick="document.getElementById('input-file-qr').click()">
+                <i class="fas fa-image"></i> Galereya
+            </button>
+        </div>
+        <input type="file" id="input-file-qr" accept="image/*" hidden onchange="scanImage(this)">
+    </section>
+
+    <section id="page-inventory" class="page-section">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h2 style="font-size: 24px;">Omborxona</h2>
+            <span id="items-counter" style="color: var(--text-muted); font-size: 14px;">0 ta turdagi tovar</span>
+        </div>
+
+        <div class="catalog-grid" id="catalog-list">
+            </div>
+    </section>
+
+    <section id="page-stats" class="page-section">
+        <h2 style="font-size: 24px; margin-bottom: 20px;">Hisobotlar</h2>
+
+        <div class="filter-scroll">
+            <div class="filter-chip active" onclick="updateStatsPeriod('all', this)">Barchasi</div>
+            <div class="filter-chip" onclick="updateStatsPeriod('today', this)">Bugun</div>
+            <div class="filter-chip" onclick="updateStatsPeriod('week', this)">Shu hafta</div>
+            <div class="filter-chip" onclick="updateStatsPeriod('month', this)">Shu oy</div>
+        </div>
+
+        <div class="stats-grid">
+            <div class="main-stat-card">
+                <span class="stat-label">UMUMIY TUSHUM</span>
+                <div class="stat-value" id="stat-total-revenue">0 so'm</div>
+            </div>
+            <div class="sub-stat-card">
+                <span class="stat-label">SOF FOYDA</span>
+                <div class="sub-stat-value" id="stat-total-profit" style="color: var(--success);">0</div>
+            </div>
+            <div class="sub-stat-card">
+                <span class="stat-label">SOTUVLAR</span>
+                <div class="sub-stat-value" id="stat-sales-count">0 ta</div>
+            </div>
+        </div>
+
+        <button class="btn-primary btn-excel" onclick="exportToExcel()">
+            <i class="fas fa-file-excel"></i> EXCELGA EKSPORT QILISH
+        </button>
+
+        <button class="btn-secondary btn-danger" onclick="clearFullStats()" style="margin-top: 20px; opacity: 0.7;">
+            <i class="fas fa-trash-alt"></i> SAVDO TARIXINI TOZALASH
+        </button>
+    </section>
+
+    <nav>
+        <button class="nav-item active" onclick="changePage('page-scan', this)">
+            <i class="fas fa-barcode"></i>
+            <span>Sotuv</span>
+        </button>
+        <button class="nav-item" onclick="changePage('page-inventory', this)">
+            <i class="fas fa-boxes"></i>
+            <span>Ombor</span>
+        </button>
+        <button class="nav-item" onclick="changePage('page-stats', this)">
+            <i class="fas fa-chart-line"></i>
+            <span>Tahlil</span>
+        </button>
+    </nav>
+
+    <div id="modal-add" class="modal-overlay">
+        <div class="modal-box">
+            <h2 style="margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+                <i class="fas fa-plus-square" style="color: var(--gold);"></i> 
+                Yangi Mahsulot
+            </h2>
+
+            <div class="input-group">
+                <label>Mahsulot Rasmi</label>
+                <div id="image-drop-zone" onclick="document.getElementById('product-image-input').click()" 
+                     style="height: 180px; border: 2px dashed #444; border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #0a0a0a; cursor: pointer; overflow: hidden;">
+                    <i class="fas fa-cloud-upload-alt" style="font-size: 30px; color: #444; margin-bottom: 10px;"></i>
+                    <span id="upload-status" style="color: #666; font-size: 13px;">Rasm tanlash uchun bosing</span>
+                </div>
+                <input type="file" id="product-image-input" hidden onchange="processImageUpload(this)">
             </div>
 
-            <div style="font-size: 24px; font-weight: 900; color: var(--primary);" id="pre-price-text"></div>
-            
-            <button class="btn-confirm" id="confirm-sale-btn">SOTUVNI TASDIQLASH</button>
-            <button class="btn-delete" onclick="deleteCurrentProduct()">Mahsulotni o'chirish</button>
-            <button onclick="document.getElementById('previewModal').style.display='none'" style="background: none; border:none; color:#888; margin-top:15px; width:100%;">Yopish</button>
+            <div class="input-group">
+                <label>Mahsulot Nomi</label>
+                <input type="text" id="p-name" placeholder="Masalan: Oversize T-Shirt Lux">
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <div class="input-group">
+                    <label>Sotuv Narxi (so'm)</label>
+                    <input type="number" id="p-price-sell" placeholder="350000">
+                </div>
+                <div class="input-group">
+                    <label>Tan Narxi (so'm)</label>
+                    <input type="number" id="p-price-cost" placeholder="220000">
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label>Rang va O'lchamlar (Ombor zaxirasi)</label>
+                <div id="variant-container">
+                    <div class="variant-row">
+                        <input type="text" placeholder="Rang" class="v-color">
+                        <input type="text" placeholder="O'lcham" class="v-size">
+                        <input type="number" placeholder="Soni" class="v-qty">
+                        <span></span>
+                    </div>
+                </div>
+                <button class="add-row-btn" onclick="addNewVariantRow()">
+                    <i class="fas fa-plus"></i> Variant qo'shish (Rang/O'lcham)
+                </button>
+            </div>
+
+            <button class="btn-primary" onclick="saveNewProduct()">SAQLASH VA QR YARATISH</button>
+            <button class="btn-secondary" onclick="closeModal('modal-add')">Bekor qilish</button>
+        </div>
+    </div>
+
+    <div id="modal-view" class="modal-overlay">
+        <div class="modal-box">
+            <div id="v-image-preview" style="width: 100%; height: 250px; border-radius: 20px; overflow: hidden; margin-bottom: 20px;">
+                </div>
+
+            <h2 id="v-title" style="margin-bottom: 5px;"></h2>
+            <p id="v-price-display" style="font-size: 24px; color: var(--gold); font-weight: 800; margin-bottom: 20px;"></p>
+
+            <div class="input-group">
+                <label>Sotiladigan variantni tanlang:</label>
+                <select id="v-variant-select" style="background: #222; border-color: #444;"></select>
+            </div>
+
+            <div style="text-align: center; margin-bottom: 20px;">
+                <div id="v-qr-code" style="display: inline-block; padding: 15px; background: white; border-radius: 15px;"></div>
+                <p style="font-size: 11px; color: var(--text-muted); margin-top: 8px;">Mahsulot ID: <span id="v-id-tag"></span></p>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <button class="btn-primary" onclick="executeSale()" style="margin-bottom: 0; background: var(--success); color: white;">
+                    <i class="fas fa-check-circle"></i> SOTISH
+                </button>
+                <button class="btn-primary" onclick="manualStockAdd()" style="margin-bottom: 0; background: #007bff; color: white;">
+                    <i class="fas fa-plus"></i> ZAXIRA (+1)
+                </button>
+            </div>
+
+            <button class="btn-secondary btn-danger" onclick="deleteProductFromSystem()" style="margin-top: 15px;">
+                <i class="fas fa-trash-alt"></i> MAHSULOTNI O'CHIRISH
+            </button>
+            <button class="btn-secondary" onclick="closeModal('modal-view')" style="margin-top: 10px;">Yopish</button>
         </div>
     </div>
 
     <script>
-        /* ================= JS LOGIKA (ERINMASDAN YOZILDI) ================= */
+        /* 1. MA'LUMOTLAR OMBORI (DATABASE) */
+        let products = JSON.parse(localStorage.getItem('lux_pro_products')) || [];
+        let salesHistory = JSON.parse(localStorage.getItem('lux_pro_sales')) || [];
+        
+        let tempImageBase64 = null;
+        let activeProductID = null;
+        let statsCurrentFilter = 'all';
+        let html5QrScanner = null;
 
-        let db_inventory = JSON.parse(localStorage.getItem('lux_inv_v3')) || [];
-        let db_sales = JSON.parse(localStorage.getItem('lux_sales_v3')) || [];
-        let html5QrCode = null;
-        let selectedBase64Img = null;
-        let activeId = null;
-
-        // 1. Tablarni almashtirish
-        function switchTab(id, btn) {
-            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-            btn.classList.add('active');
+        /* 2. SAHIFA BOSHQARUVI */
+        function changePage(pageID, navElement) {
+            document.querySelectorAll('.page-section').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             
-            if(id === 'admin-sec') renderKatalog();
-            if(id === 'tahlil-sec') renderStats();
-            if(html5QrCode) stopCamera();
+            document.getElementById(pageID).classList.add('active');
+            navElement.classList.add('active');
+
+            if(pageID === 'page-inventory') renderInventory();
+            if(pageID === 'page-stats') renderStatistics();
+            
+            // Skanerni to'xtatish agar boshqa sahifaga o'tsa
+            if(pageID !== 'page-scan' && html5QrScanner) {
+                html5QrScanner.clear();
+            }
         }
 
-        // 2. Form funksiyalari
-        function openAddModal() { document.getElementById('addModal').style.display = 'flex'; }
-        function closeAddModal() { document.getElementById('addModal').style.display = 'none'; resetForm(); }
-
-        function updateRangeLabel(id, val) {
-            document.getElementById(id).innerText = parseInt(val).toLocaleString();
+        /* 3. MODAL FUNKSIYALARI */
+        function openModal(id) {
+            document.getElementById(id).style.display = 'flex';
         }
 
-        function toggleChip(el) { el.classList.toggle('selected'); }
+        function closeModal(id) {
+            document.getElementById(id).style.display = 'none';
+            if(id === 'modal-add') resetAddForm();
+        }
 
-        function handleImgSelect(input) {
+        function resetAddForm() {
+            document.getElementById('p-name').value = "";
+            document.getElementById('p-price-sell').value = "";
+            document.getElementById('p-price-cost').value = "";
+            document.getElementById('variant-container').innerHTML = `
+                <div class="variant-row">
+                    <input type="text" placeholder="Rang" class="v-color">
+                    <input type="text" placeholder="O'lcham" class="v-size">
+                    <input type="number" placeholder="Soni" class="v-qty">
+                    <span></span>
+                </div>`;
+            document.getElementById('image-drop-zone').innerHTML = `
+                <i class="fas fa-cloud-upload-alt" style="font-size: 30px; color: #444; margin-bottom: 10px;"></i>
+                <span style="color: #666; font-size: 13px;">Rasm tanlash uchun bosing</span>`;
+            tempImageBase64 = null;
+        }
+
+        /* 4. VARIANTLAR BILAN ISHLASH */
+        function addNewVariantRow() {
+            const container = document.getElementById('variant-container');
+            const row = document.createElement('div');
+            row.className = 'variant-row';
+            row.innerHTML = `
+                <input type="text" placeholder="Rang" class="v-color">
+                <input type="text" placeholder="O'lcham" class="v-size">
+                <input type="number" placeholder="Soni" class="v-qty">
+                <i class="fas fa-minus-circle" style="color: var(--error);" onclick="this.parentElement.remove()"></i>
+            `;
+            container.appendChild(row);
+        }
+
+        /* 5. RASM BILAN ISHLASH */
+        function processImageUpload(input) {
             if (input.files && input.files[0]) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    selectedBase64Img = e.target.result;
-                    const btn = document.getElementById('img-preview-btn');
-                    btn.classList.add('previewed');
-                    btn.innerHTML = `<img src="${selectedBase64Img}" style="width:100%; height:100%; object-fit:cover; border-radius:12px;">`;
+                    tempImageBase64 = e.target.result;
+                    const dropZone = document.getElementById('image-drop-zone');
+                    dropZone.innerHTML = `<img src="${tempImageBase64}" style="width: 100%; height: 100%; object-fit: cover;">`;
                 };
                 reader.readAsDataURL(input.files[0]);
             }
         }
 
-        function resetForm() {
-            document.getElementById('p-name').value = "";
-            document.getElementById('p-desc').value = "";
-            document.querySelectorAll('.chip').forEach(c => c.classList.remove('selected'));
-            document.getElementById('img-preview-btn').classList.remove('previewed');
-            document.getElementById('img-preview-btn').innerHTML = `<i class="fas fa-cloud-upload-alt"></i><span>Rasm yuklash</span>`;
-            selectedBase64Img = null;
-        }
-
-        // 3. Mahsulotni saqlash
-        function saveProductToDB() {
+        /* 6. MAHSULOTNI SAQLASH */
+        function saveNewProduct() {
             const name = document.getElementById('p-name').value;
-            const desc = document.getElementById('p-desc').value;
-            const price = parseInt(document.getElementById('p-price').value);
-            const cost = parseInt(document.getElementById('p-cost').value);
-            
-            const sizes = Array.from(document.querySelectorAll('#size-chips .selected')).map(c => c.innerText);
-            const colors = Array.from(document.querySelectorAll('#color-chips .selected')).map(c => c.innerText);
+            const priceSell = parseInt(document.getElementById('p-price-sell').value);
+            const priceCost = parseInt(document.getElementById('p-price-cost').value);
 
-            if(!name || !selectedBase64Img || sizes.length === 0 || colors.length === 0) {
-                alert("Iltimos, nom, rasm, kamida bitta o'lcham va rangni tanlang!");
+            const colorInputs = document.querySelectorAll('.v-color');
+            const sizeInputs = document.querySelectorAll('.v-size');
+            const qtyInputs = document.querySelectorAll('.v-qty');
+
+            let variants = [];
+            for(let i = 0; i < colorInputs.length; i++) {
+                if(colorInputs[i].value && qtyInputs[i].value) {
+                    variants.push({
+                        color: colorInputs[i].value,
+                        size: sizeInputs[i].value || 'N/A',
+                        qty: parseInt(qtyInputs[i].value)
+                    });
+                }
+            }
+
+            if(!name || !priceSell || variants.length === 0 || !tempImageBase64) {
+                alert("Iltimos, barcha maydonlarni to'ldiring va rasm yuklang!");
                 return;
             }
 
-            const product = {
-                id: "LX" + Math.floor(Math.random() * 1000000),
-                name, desc, price, cost, sizes, colors,
-                img: selectedBase64Img,
-                createdAt: new Date().toISOString()
+            const newProduct = {
+                id: "PRD-" + Date.now(),
+                name: name,
+                price: priceSell,
+                cost: priceCost || 0,
+                image: tempImageBase64,
+                variants: variants,
+                dateAdded: new Date().toISOString()
             };
 
-            db_inventory.push(product);
-            localStorage.setItem('lux_inv_v3', JSON.stringify(db_inventory));
-            
+            products.push(newProduct);
+            syncStorage();
+            closeModal('modal-add');
+            renderInventory();
             alert("Mahsulot muvaffaqiyatli qo'shildi!");
-            closeAddModal();
-            renderKatalog();
         }
 
-        // 4. Katalog render
-        function renderKatalog() {
-            const list = document.getElementById('product-list');
-            list.innerHTML = "";
-            document.getElementById('items-count').innerText = db_inventory.length + " mahsulot";
+        /* 7. OMBORNI RENDER QILISH */
+        function renderInventory() {
+            const container = document.getElementById('catalog-list');
+            const counter = document.getElementById('items-counter');
+            container.innerHTML = "";
+            counter.innerText = products.length + " ta turdagi tovar";
 
-            db_inventory.sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt)).forEach(p => {
+            products.forEach(product => {
+                const totalStock = product.variants.reduce((acc, v) => acc + v.qty, 0);
+                const hasWarning = product.variants.some(v => v.qty < 3);
+
                 const card = document.createElement('div');
-                card.className = 'product-card';
-                card.onclick = () => openPreview(p.id);
+                card.className = 'product-item';
+                card.onclick = () => showProductDetail(product.id);
+                
                 card.innerHTML = `
-                    <div class="product-img"><img src="${p.img}"></div>
-                    <div class="product-info">
-                        <h4>${p.name}</h4>
-                        <div class="price">${p.price.toLocaleString()} so'm</div>
+                    <div class="stock-tag ${hasWarning ? 'tag-warning' : 'tag-normal'}">
+                        ${hasWarning ? 'KAM QOLDI: ' : 'STOK: '} ${totalStock}
+                    </div>
+                    <div class="img-container">
+                        <img src="${product.image}">
+                    </div>
+                    <div class="product-details">
+                        <div class="product-title">${product.name}</div>
+                        <div class="product-price">${product.price.toLocaleString()} so'm</div>
                     </div>
                 `;
-                list.appendChild(card);
+                container.appendChild(card);
+            });
+            checkLowStockAlerts();
+        }
+
+        /* 8. MAHSULOT DETALI */
+        function showProductDetail(id) {
+            const product = products.find(p => p.id === id);
+            if(!product) return;
+
+            activeProductID = id;
+            document.getElementById('v-image-preview').innerHTML = `<img src="${product.image}" style="width:100%; height:100%; object-fit:cover;">`;
+            document.getElementById('v-title').innerText = product.name;
+            document.getElementById('v-price-display').innerText = product.price.toLocaleString() + " so'm";
+            document.getElementById('v-id-tag').innerText = product.id;
+
+            const select = document.getElementById('v-variant-select');
+            select.innerHTML = "";
+            product.variants.forEach((v, index) => {
+                const option = document.createElement('option');
+                option.value = index;
+                option.innerText = `${v.color} - ${v.size} (Omborda: ${v.qty} ta)`;
+                if(v.qty <= 0) option.disabled = true;
+                select.appendChild(option);
+            });
+
+            // QR yaratish
+            document.getElementById('v-qr-code').innerHTML = "";
+            new QRCode(document.getElementById('v-qr-code'), {
+                text: product.id,
+                width: 140,
+                height: 140
+            });
+
+            openModal('modal-view');
+        }
+
+        /* 9. SOTUV JARAYONI */
+        function executeSale() {
+            const productIndex = products.findIndex(p => p.id === activeProductID);
+            const variantIndex = document.getElementById('v-variant-select').value;
+
+            if(productIndex === -1 || variantIndex === "") return;
+
+            const product = products[productIndex];
+            const variant = product.variants[variantIndex];
+
+            if(variant.qty <= 0) {
+                alert("Xatolik: Bu variantdan omborda qolmagan!");
+                return;
+            }
+
+            if(confirm(`${product.name} (${variant.color}) sotuvini tasdiqlaysizmi?`)) {
+                // 1. Ombordan kamaytirish
+                products[productIndex].variants[variantIndex].qty -= 1;
+
+                // 2. Savdo tarixiga qo'shish
+                const saleRecord = {
+                    saleID: "SL-" + Date.now(),
+                    productID: product.id,
+                    name: product.name,
+                    variant: `${variant.color} / ${variant.size}`,
+                    price: product.price,
+                    cost: product.cost,
+                    profit: product.price - product.cost,
+                    date: new Date().toISOString()
+                };
+
+                salesHistory.push(saleRecord);
+                syncStorage();
+                
+                alert("Sotuv muvaffaqiyatli amalga oshirildi!");
+                closeModal('modal-view');
+                renderInventory();
+            }
+        }
+
+        /* 10. ZAXIRA QO'SHISH */
+        function manualStockAdd() {
+            const productIndex = products.findIndex(p => p.id === activeProductID);
+            const variantIndex = document.getElementById('v-variant-select').value;
+
+            if(productIndex !== -1) {
+                products[productIndex].variants[variantIndex].qty += 1;
+                syncStorage();
+                showProductDetail(activeProductID); // Ma'lumotni yangilash
+                renderInventory();
+            }
+        }
+
+        /* 11. STATISTIKA HISOB-KITOBI */
+        function updateStatsPeriod(period, element) {
+            statsCurrentFilter = period;
+            document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+            element.classList.add('active');
+            renderStatistics();
+        }
+
+        function renderStatistics() {
+            let filteredSales = [...salesHistory];
+            const today = new Date().toDateString();
+
+            if(statsCurrentFilter === 'today') {
+                filteredSales = salesHistory.filter(s => new Date(s.date).toDateString() === today);
+            } else if(statsCurrentFilter === 'week') {
+                const weekAgo = new Date();
+                weekAgo.setDate(weekAgo.getDate() - 7);
+                filteredSales = salesHistory.filter(s => new Date(s.date) > weekAgo);
+            } else if(statsCurrentFilter === 'month') {
+                const currentMonth = new Date().getMonth();
+                filteredSales = salesHistory.filter(s => new Date(s.date).getMonth() === currentMonth);
+            }
+
+            const totalRevenue = filteredSales.reduce((acc, s) => acc + s.price, 0);
+            const totalProfit = filteredSales.reduce((acc, s) => acc + s.profit, 0);
+
+            document.getElementById('stat-total-revenue').innerText = totalRevenue.toLocaleString() + " so'm";
+            document.getElementById('stat-total-profit').innerText = totalProfit.toLocaleString() + " so'm";
+            document.getElementById('stat-sales-count').innerText = filteredSales.length + " ta";
+        }
+
+        /* 12. EXCEL EKSPORT */
+        function exportToExcel() {
+            if(salesHistory.length === 0) {
+                alert("Eksport qilish uchun savdolar mavjud emas!");
+                return;
+            }
+
+            const excelData = salesHistory.map(s => ({
+                "ID": s.saleID,
+                "Mahsulot": s.name,
+                "Variant": s.variant,
+                "Sotilgan Narx": s.price,
+                "Tan Narx": s.cost,
+                "Sof Foyda": s.profit,
+                "Sana": new Date(s.date).toLocaleString()
+            }));
+
+            const worksheet = XLSX.utils.json_to_sheet(excelData);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Savdo_Hisoboti");
+            XLSX.writeFile(workbook, `LuxWear_Hisobot_${new Date().toLocaleDateString()}.xlsx`);
+        }
+
+        /* 13. OGOHLANTIRISH TIZIMI */
+        function checkLowStockAlerts() {
+            const alertBox = document.getElementById('low-stock-alert');
+            const alertList = document.getElementById('alert-list');
+            alertList.innerHTML = "";
+            let warnings = [];
+
+            products.forEach(p => {
+                p.variants.forEach(v => {
+                    if(v.qty < 3) {
+                        warnings.push({
+                            name: p.name,
+                            variant: `${v.color}-${v.size}`,
+                            count: v.qty
+                        });
+                    }
+                });
+            });
+
+            if(warnings.length > 0) {
+                alertBox.style.display = "block";
+                warnings.slice(0, 5).forEach(w => {
+                    const div = document.createElement('div');
+                    div.className = 'alert-item';
+                    div.innerHTML = `<span>${w.name} (${w.variant})</span> <b>${w.count} ta qoldi</b>`;
+                    alertList.appendChild(div);
+                });
+            } else {
+                alertBox.style.display = "none";
+            }
+        }
+
+        /* 14. QR SCANNER FUNKSIYALARI */
+        function startQRScanner() {
+            html5QrScanner = new Html5Qrcode("qr-reader");
+            const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+            
+            html5QrScanner.start({ facingMode: "environment" }, config, (decodedText) => {
+                html5QrScanner.stop();
+                showProductDetail(decodedText);
+            }).catch(err => {
+                console.error(err);
+                alert("Kameraga ruxsat berilmagan yoki xatolik yuz berdi.");
             });
         }
 
-        // 5. Batafsil ko'rish (Preview)
-        function openPreview(id) {
-            const p = db_inventory.find(i => i.id === id);
-            if(!p) return;
-            activeId = id;
-
-            document.getElementById('pre-img-container').innerHTML = `<img src="${p.img}" class="preview-img">`;
-            document.getElementById('pre-title').innerText = p.name;
-            document.getElementById('pre-description').innerText = p.desc || "Tavsif berilmagan";
-            document.getElementById('pre-price-text').innerText = p.price.toLocaleString() + " so'm";
-            document.getElementById('pre-id-text').innerText = "ID: " + p.id;
+        function scanImage(input) {
+            const file = input.files[0];
+            if(!file) return;
             
-            document.getElementById('pre-tags').innerHTML = `
-                ${p.sizes.map(s => `<span class="chip selected" style="padding: 4px 10px; font-size:10px;">${s}</span>`).join('')}
-                ${p.colors.map(c => `<span class="chip selected" style="padding: 4px 10px; font-size:10px; background:#444; color:#fff;">${c}</span>`).join('')}
-            `;
-
-            document.getElementById('pre-qrcode').innerHTML = "";
-            new QRCode(document.getElementById('pre-qrcode'), { text: p.id, width: 180, height: 180 });
-
-            document.getElementById('confirm-sale-btn').onclick = () => confirmSale(p.id);
-            document.getElementById('previewModal').style.display = 'flex';
+            const html5QrCode = new Html5Qrcode("qr-reader");
+            html5QrCode.scanFile(file, true)
+                .then(decodedText => {
+                    showProductDetail(decodedText);
+                })
+                .catch(err => {
+                    alert("QR kod topilmadi. Iltimos, aniqroq rasm yuklang.");
+                });
         }
 
-        // 6. Skanerlash (Kamera & Galereya)
-        function startCamera() {
-            html5QrCode = new Html5Qrcode("reader");
-            html5QrCode.start(
-                { facingMode: "environment" }, 
-                { fps: 10, qrbox: { width: 250, height: 250 } },
-                (decodedText) => {
-                    stopCamera();
-                    openPreview(decodedText);
-                }
-            ).catch(err => alert("Kamera xatosi: " + err));
+        /* 15. MA'LUMOTLARNI TOZALASH VA SINXRONLASH */
+        function syncStorage() {
+            localStorage.setItem('lux_pro_products', JSON.stringify(products));
+            localStorage.setItem('lux_pro_sales', JSON.stringify(salesHistory));
         }
 
-        function stopCamera() {
-            if(html5QrCode) {
-                html5QrCode.stop().then(() => { html5QrCode = null; });
+        function clearFullStats() {
+            if(confirm("DIQQAT: Barcha savdo tarixi o'chiriladi. Ushbu amalni ortga qaytarib bo'lmaydi. Rozimisiz?")) {
+                salesHistory = [];
+                syncStorage();
+                renderStatistics();
             }
         }
 
-        function scanFromGallery(input) {
-            if (input.files && input.files[0]) {
-                const scanner = new Html5Qrcode("reader");
-                scanner.scanFile(input.files[0], true)
-                .then(decodedText => openPreview(decodedText))
-                .catch(err => alert("Rasmda QR kod topilmadi!"));
+        function deleteProductFromSystem() {
+            if(confirm("Ushbu mahsulotni bazadan butunlay o'chirmoqchimisiz?")) {
+                products = products.filter(p => p.id !== activeProductID);
+                syncStorage();
+                closeModal('modal-view');
+                renderInventory();
             }
         }
 
-        // 7. Sotuv va O'chirish
-        function confirmSale(id) {
-            if(confirm("Ushbu mahsulot sotilganini tasdiqlaysizmi?")) {
-                const index = db_inventory.findIndex(p => p.id === id);
-                if(index > -1) {
-                    const soldItem = db_inventory.splice(index, 1)[0];
-                    db_sales.push({ ...soldItem, soldAt: new Date().toISOString() });
-                    
-                    localStorage.setItem('lux_inv_v3', JSON.stringify(db_inventory));
-                    localStorage.setItem('lux_sales_v3', JSON.stringify(db_sales));
-                    
-                    document.getElementById('previewModal').style.display = 'none';
-                    renderKatalog();
-                    alert("Sotuv muvaffaqiyatli qayd etildi!");
-                }
-            }
-        }
-
-        function deleteCurrentProduct() {
-            if(confirm("Haqiqatan ham o'chirmoqchimisiz?")) {
-                db_inventory = db_inventory.filter(p => p.id !== activeId);
-                localStorage.setItem('lux_inv_v3', JSON.stringify(db_inventory));
-                document.getElementById('previewModal').style.display = 'none';
-                renderKatalog();
-            }
-        }
-
-        // 8. Statistika
-        function renderStats() {
-            const totalRevenue = db_sales.reduce((sum, item) => sum + item.price, 0);
-            const totalCost = db_sales.reduce((sum, item) => sum + item.cost, 0);
-            const netProfit = totalRevenue - totalCost;
-
-            document.getElementById('stat-total-sales').innerText = totalRevenue.toLocaleString() + " so'm";
-            document.getElementById('stat-net-profit').innerText = netProfit.toLocaleString() + " so'm";
-            document.getElementById('stat-items-sold').innerText = db_sales.length + " ta";
-        }
-
-        window.onload = renderKatalog;
+        /* ILK YUKLANISH */
+        window.onload = () => {
+            renderInventory();
+        };
     </script>
 </body>
 </html>
